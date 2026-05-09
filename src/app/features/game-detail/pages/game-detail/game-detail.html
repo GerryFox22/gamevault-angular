@@ -7,23 +7,14 @@
       ← Back to games
     </a>
 
-    <div *ngIf="isLoading" class="text-zinc-400">
-      Loading game detail...
-    </div>
+    <div *ngIf="isLoading" class="text-zinc-400">Loading game detail...</div>
 
-    <div
-      *ngIf="errorMessage"
-      class="rounded-xl bg-red-500/10 p-4 text-red-300"
-    >
+    <div *ngIf="errorMessage" class="rounded-xl bg-red-500/10 p-4 text-red-300">
       {{ errorMessage }}
     </div>
 
     <article *ngIf="game" class="overflow-hidden rounded-3xl bg-zinc-900 shadow-2xl">
-      <img
-        [src]="game.background_image"
-        [alt]="game.name"
-        class="h-[420px] w-full object-cover"
-      />
+      <img [src]="game.background_image" [alt]="game.name" class="h-[105] w-full object-cover" />
 
       <div class="p-8">
         <div class="mb-6 flex flex-wrap items-center gap-3">
@@ -57,7 +48,7 @@
 
             <div class="flex flex-wrap gap-2">
               <span
-                *ngFor="let platform of (game.platforms || [])"
+                *ngFor="let platform of game.platforms || []"
                 class="rounded-full bg-zinc-800 px-3 py-1 text-sm text-zinc-300"
               >
                 {{ platform.platform.name }}
@@ -70,7 +61,7 @@
 
             <div class="flex flex-wrap gap-2">
               <span
-                *ngFor="let developer of (game.developers || [])"
+                *ngFor="let developer of game.developers || []"
                 class="rounded-full bg-zinc-800 px-3 py-1 text-sm text-zinc-300"
               >
                 {{ developer.name }}

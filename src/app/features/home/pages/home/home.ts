@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { Subject, Subscription, debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs';
 
 import { Game } from '../../../../models/game.model';
 import { GameService } from '../../../../services/game.service';
@@ -13,89 +14,78 @@ import { GameService } from '../../../../services/game.service';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home implements OnInit {
+export class Home implements OnInit, OnDestroy {
   private readonly gameService = inject(GameService);
-  private readonly cdr = inject(ChangeDetectorRef);
 
-  games: Game[] = [];
+  private readonly searchSubject = new Subject<string>();
+  private searchSubscription?: Subscription;
+
+  games = signal<Game[]>([]);
+  isLoading = signal(false);
+  errorMessage = signal('');
+
   searchTerm = '';
-  isLoading = false;
-  errorMessage = '';
 
   ngOnInit(): void {
+    this.setupSearch();
     this.loadGames();
   }
 
+  ngOnDestroy(): void {
+    this.searchSubscription?.unsubscribe();
+  }
+
   loadGames(): void {
-    this.isLoading = true;
-    this.errorMessage = '';
+    this.isLoading.set(true);
+    this.errorMessage.set('');
 
     this.gameService.getPopularGames().subscribe({
       next: (response) => {
-        this.games = response.results;
-        this.isLoading = false;
-        this.cdr.detectChanges();
+        this.games.set(response.results);
+        this.isLoading.set(false);
       },
       error: (error) => {
         console.error(error);
-        this.errorMessage = 'Errore durante il caricamento dei giochi.';
-        this.isLoading = false;
-        this.cdr.detectChanges();
+        this.errorMessage.set('Errore durante il caricamento dei giochi.');
+        this.isLoading.set(false);
       },
     });
   }
 
-  searchGames(): void {
-    const search = this.searchTerm.trim();
-
-    if (!search) {
-      this.loadGames();
-      return;
-    }
-
-    this.isLoading = true;
-    this.errorMessage = '';
-
-    this.gameService.searchGames(search).subscribe({
-      next: (response) => {
-        this.games = response.results;
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error(error);
-        this.errorMessage = 'Errore durante la ricerca dei giochi.';
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      },
-    });
-  }
   onSearchChange(): void {
-    const search = this.searchTerm.trim();
+    this.searchSubject.next(this.searchTerm);
+  }
 
-    this.games = [];
-    this.errorMessage = '';
+  private setupSearch(): void {
+    this.searchSubscription = this.searchSubject
+      .pipe(
+        debounceTime(400),
+        distinctUntilChanged(),
+        tap(() => {
+          this.games.set([]);
+          this.isLoading.set(true);
+          this.errorMessage.set('');
+        }),
+        switchMap((searchTerm) => {
+          const search = searchTerm.trim();
 
-    if (!search) {
-      this.loadGames();
-      return;
-    }
+          if (!search) {
+            return this.gameService.getPopularGames();
+          }
 
-    this.isLoading = true;
-    this.cdr.detectChanges();
-
-    this.gameService.searchGames(search).subscribe({
-      next: (response) => {
-        this.games = response.results;
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error(error);
-        this.errorMessage = 'Errore durante la ricerca dei giochi.';
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      },
-    });
+          return this.gameService.searchGames(search);
+        }),
+      )
+      .subscribe({
+        next: (response) => {
+          this.games.set(response.results);
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          console.error(error);
+          this.errorMessage.set('Errore durante la ricerca dei giochi.');
+          this.isLoading.set(false);
+        },
+      });
   }
 }
