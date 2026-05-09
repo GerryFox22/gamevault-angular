@@ -3,11 +3,12 @@ import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 
 import { Game } from '../../../../models/game.model';
 import { GameService } from '../../../../services/game.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './home.html',
   styleUrl: './home.css'
 })

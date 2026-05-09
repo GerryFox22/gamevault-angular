@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../environments/environment';
-import { GamesResponse } from '../models/game.model';
+import { GameDetail, GamesResponse } from '../models/game.model';
 
 @Injectable({
   providedIn: 'root'
@@ -30,5 +30,11 @@ export class GameService {
       .set('page_size', 12);
 
     return this.http.get<GamesResponse>(`${this.apiUrl}/games`, { params });
+  }
+
+  getGameById(id: number): Observable<GameDetail> {
+    const params = new HttpParams().set('key', this.apiKey);
+
+    return this.http.get<GameDetail>(`${this.apiUrl}/games/${id}`, { params });
   }
 }

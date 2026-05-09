@@ -42,3 +42,17 @@ export interface Platform {
   slug: string;
   name: string;
 }
+
+export interface GameDetail extends Game {
+  description_raw: string;
+  website: string;
+  reddit_url: string;
+  developers: {
+    id: number;
+    name: string;
+  }[];
+  publishers: {
+    id: number;
+    name: string;
+  }[];
+}

@@ -1,1 +1,84 @@
-<p>game-detail works!</p>
+<section class="min-h-screen bg-zinc-950 text-white">
+  <div class="mx-auto max-w-6xl px-6 py-10">
+    <a
+      routerLink="/"
+      class="mb-8 inline-flex rounded-full bg-zinc-900 px-4 py-2 text-sm text-zinc-300 transition hover:bg-zinc-800"
+    >
+      ← Back to games
+    </a>
+
+    <div *ngIf="isLoading" class="text-zinc-400">
+      Loading game detail...
+    </div>
+
+    <div
+      *ngIf="errorMessage"
+      class="rounded-xl bg-red-500/10 p-4 text-red-300"
+    >
+      {{ errorMessage }}
+    </div>
+
+    <article *ngIf="game" class="overflow-hidden rounded-3xl bg-zinc-900 shadow-2xl">
+      <img
+        [src]="game.background_image"
+        [alt]="game.name"
+        class="h-[420px] w-full object-cover"
+      />
+
+      <div class="p-8">
+        <div class="mb-6 flex flex-wrap items-center gap-3">
+          <span class="rounded-full bg-purple-500/20 px-4 py-1 text-sm text-purple-300">
+            ⭐ {{ game.rating }}
+          </span>
+
+          <span class="rounded-full bg-zinc-800 px-4 py-1 text-sm text-zinc-300">
+            Released: {{ game.released }}
+          </span>
+
+          <span
+            *ngIf="game.metacritic"
+            class="rounded-full bg-emerald-500/20 px-4 py-1 text-sm text-emerald-300"
+          >
+            Metacritic: {{ game.metacritic }}
+          </span>
+        </div>
+
+        <h1 class="mb-4 text-4xl font-bold md:text-6xl">
+          {{ game.name }}
+        </h1>
+
+        <p class="mb-8 max-w-4xl text-lg leading-8 text-zinc-300">
+          {{ game.description_raw }}
+        </p>
+
+        <div class="grid gap-6 md:grid-cols-2">
+          <div class="rounded-2xl bg-zinc-950 p-6">
+            <h2 class="mb-4 text-xl font-bold">Platforms</h2>
+
+            <div class="flex flex-wrap gap-2">
+              <span
+                *ngFor="let platform of (game.platforms || [])"
+                class="rounded-full bg-zinc-800 px-3 py-1 text-sm text-zinc-300"
+              >
+                {{ platform.platform.name }}
+              </span>
+            </div>
+          </div>
+
+          <div class="rounded-2xl bg-zinc-950 p-6">
+            <h2 class="mb-4 text-xl font-bold">Developers</h2>
+
+            <div class="flex flex-wrap gap-2">
+              <span
+                *ngFor="let developer of (game.developers || [])"
+                class="rounded-full bg-zinc-800 px-3 py-1 text-sm text-zinc-300"
+              >
+                {{ developer.name }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
