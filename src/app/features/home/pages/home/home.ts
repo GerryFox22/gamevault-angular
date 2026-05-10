@@ -3,14 +3,14 @@ import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
-
+import { GameCard } from '../../../games/components/game-card/game-card';
 import { Game } from '../../../../models/game.model';
 import { GameService } from '../../../../services/game.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, GameCard],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
@@ -73,6 +73,12 @@ export class Home implements OnInit, OnDestroy {
 
   hasNextPage(): boolean {
     return this.currentPage() * this.pageSize() < this.totalCount();
+  }
+
+  goToGameDetail(gameId: number): void {
+    this.router.navigate(['/games', gameId], {
+      queryParamsHandling: 'preserve',
+    });
   }
 
   private setupSearch(): void {
