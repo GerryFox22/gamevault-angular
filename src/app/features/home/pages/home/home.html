@@ -36,6 +36,7 @@
       <div
         *ngFor="let game of games()"
         [routerLink]="['/games', game.id]"
+        queryParamsHandling="preserve"
         class="cursor-pointer overflow-hidden rounded-2xl bg-zinc-900 shadow-lg transition duration-300 hover:-translate-y-1 hover:bg-zinc-800 hover:shadow-purple-500/10"
       >
         <img [src]="game.background_image" [alt]="game.name" class="h-52 w-full object-cover" />
@@ -62,6 +63,44 @@
             </span>
           </div>
         </div>
+      </div>
+    </div>
+    <div class="mt-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div class="flex items-center gap-3">
+        <label class="text-sm text-zinc-400"> Games per page </label>
+
+        <select
+          [ngModel]="pageSize()"
+          (ngModelChange)="pageSize.set($event); onPageSizeChange()"
+          class="rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2 text-white outline-none focus:border-purple-500"
+        >
+          <option [ngValue]="8">8</option>
+          <option [ngValue]="12">12</option>
+          <option [ngValue]="16">16</option>
+          <option [ngValue]="20">20</option>
+        </select>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button
+          type="button"
+          (click)="goToPreviousPage()"
+          [disabled]="currentPage() === 1"
+          class="rounded-xl bg-zinc-900 px-4 py-2 text-sm text-zinc-300 transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Previous
+        </button>
+
+        <span class="text-sm text-zinc-400"> Page {{ currentPage() }} </span>
+
+        <button
+          type="button"
+          (click)="goToNextPage()"
+          [disabled]="!hasNextPage()"
+          class="rounded-xl bg-zinc-900 px-4 py-2 text-sm text-zinc-300 transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Next
+        </button>
       </div>
     </div>
   </div>

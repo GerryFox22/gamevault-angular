@@ -6,7 +6,7 @@ import { environment } from '../../environments/environment';
 import { GameDetail, GamesResponse } from '../models/game.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GameService {
   private readonly apiUrl = environment.rawgApiUrl;
@@ -14,20 +14,22 @@ export class GameService {
 
   constructor(private http: HttpClient) {}
 
-  getPopularGames(): Observable<GamesResponse> {
+  getPopularGames(page: number, pageSize: number): Observable<GamesResponse> {
     const params = new HttpParams()
       .set('key', this.apiKey)
       .set('ordering', '-rating')
-      .set('page_size', 12);
+      .set('page', page)
+      .set('page_size', pageSize);
 
     return this.http.get<GamesResponse>(`${this.apiUrl}/games`, { params });
   }
 
-  searchGames(search: string): Observable<GamesResponse> {
+  searchGames(search: string, page: number, pageSize: number): Observable<GamesResponse> {
     const params = new HttpParams()
       .set('key', this.apiKey)
       .set('search', search)
-      .set('page_size', 12);
+      .set('page', page)
+      .set('page_size', pageSize);
 
     return this.http.get<GamesResponse>(`${this.apiUrl}/games`, { params });
   }
